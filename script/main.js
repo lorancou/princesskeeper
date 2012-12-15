@@ -1,20 +1,32 @@
 var gamejs = require('gamejs');
 var box2d = require('Box2dWeb-2.1.a.3.min');
-	
-// gamejs.preload([]);
+var object = require('object');
 
-gamejs.ready(function() {
+var data = [
+    
+    "./data/block01.png",
+    "./data/block02.png",
+];
 
-    var display = gamejs.display.setMode([600, 400]);
+gamejs.preload(data);
+gamejs.ready(main);
+
+function main() {
+
+    var display = gamejs.display.setMode([1024, 768]);
     display.blit(
-        (new gamejs.font.Font('30px Sans-serif')).render('Hello World')
+        (new gamejs.font.Font('30px Sans-serif')).render('TODO: a game')
     );
 
-    /**
-    function tick(msDuration) {
-        // game loop
-        return;
-    };
-    gamejs.time.fpsCallback(tick, this, 60);
-    **/
-});
+    gamejs.time.fpsCallback(update, this, 60);
+    
+    var myBlock = new object.block();
+    console.log(myBlock.coucou);
+}
+
+function update(msDuration) {
+    
+    //console.log("update");
+    
+    return;
+}
