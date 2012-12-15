@@ -4,8 +4,10 @@ var object = require('object');
 
 var data = [
     
+    "../data/block00.png",
     "../data/block01.png",
     "../data/block02.png",
+    "../data/block03.png",
 ];
 
 gamejs.preload(data);
@@ -18,10 +20,8 @@ function main() {
     gamejs.display.setMode([1024, 768]);
 
     gBlocks = new gamejs.sprite.Group();
-    for (var j=0;j<4;j++) {
-        for (var i=0; i<4; i++) {
-            gBlocks.add(new object.block([32 + i*64, 32 + j * 64]));
-        }
+    for (var i=0; i<4; i++) {
+        gBlocks.add(new object.block([32 + i*64, 32], i));
     }
     
     gamejs.time.fpsCallback(update, this, 60);

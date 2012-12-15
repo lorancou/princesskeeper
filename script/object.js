@@ -1,12 +1,12 @@
 var gamejs = require('gamejs');
 
-exports.block = function(rect) {
+exports.block = function(rect, index) {
     
     this.coucou = "coucou2";
 
     exports.block.superConstructor.apply(this, arguments);
 
-    this.originalImage = gamejs.image.load("../data/block01.png");
+    this.originalImage = gamejs.image.load("../data/block0" + index + ".png");
     var dims = this.originalImage.getSize();
 
     /*this.originalImage = gamejs.transform.scale(
