@@ -29,11 +29,40 @@ function main() {
 
 function update(msDuration) {
     
-    var mainSurface = gamejs.display.getSurface();
-    
-    gBlocks.draw(mainSurface);
+    input();
+    draw();
     
     //console.log("update");
     
     return;
+}
+
+function input() {
+    
+    // handle key / mouse events
+    gamejs.event.get().forEach(function(event) {
+        if (event.type === gamejs.event.KEY_UP) {
+            if (event.key === gamejs.event.K_UP) {
+                console.log("up pressed");
+            };
+        } else if (event.type === gamejs.event.MOUSE_MOTION) {
+            // if mouse is over display surface
+            /*if (displayRect.collidePoint(event.pos)) {
+            // add sparkle at mouse position
+            sparkles.push({
+            left: event.pos[0],
+            top: event.pos[1],
+            alpha: Math.random(),
+            deltaX: 30 - Math.random() * 60,
+            deltaY: 80 + Math.random() * 40,
+            });
+            }*/
+        }
+    });
+}
+
+function draw() {
+    
+    var mainSurface = gamejs.display.getSurface();
+    gBlocks.draw(mainSurface);
 }

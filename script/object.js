@@ -2,8 +2,6 @@ var gamejs = require('gamejs');
 
 exports.block = function(rect, index) {
     
-    this.coucou = "coucou2";
-
     exports.block.superConstructor.apply(this, arguments);
 
     this.originalImage = gamejs.image.load("../data/block0" + index + ".png");
