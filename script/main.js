@@ -11,26 +11,27 @@ var data = [
 gamejs.preload(data);
 gamejs.ready(main);
 
-var myBlock;
+var gBlocks = new gamejs.sprite.Group();
     
 function main() {
 
-    var display = gamejs.display.setMode([1024, 768]);
-    display.blit(
-        (new gamejs.font.Font('30px Sans-serif')).render('TODO: a game')
-    );
+    gamejs.display.setMode([1024, 768]);
 
-    myBlock = new object.block([100, 100]);
-    console.log(myBlock.coucou);
-
-    gamejs.time.fpsCallback(update, this, 60);
+    gBlocks = new gamejs.sprite.Group();
+    for (var j=0;j<4;j++) {
+        for (var i=0; i<4; i++) {
+            gBlocks.add(new object.block([32 + i*64, 32 + j * 64]));
+        }
+    }
     
+    gamejs.time.fpsCallback(update, this, 60);
 }
 
 function update(msDuration) {
     
     var mainSurface = gamejs.display.getSurface();
-    myBlock.draw(mainSurface);
+    
+    gBlocks.draw(mainSurface);
     
     //console.log("update");
     
