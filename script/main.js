@@ -26,6 +26,7 @@ var gFloor = null;
 //------------------------------------------------------------------------------
 // Box2D stuff
 var b2World;
+var b2Draw = false;
 
 //------------------------------------------------------------------------------
 // entry point
@@ -42,6 +43,12 @@ function init() {
     // set display size
     gamejs.display.setMode([1024, 768]);
     
+    // create Box2D world
+    b2World = new box2d.b2World(
+       new box2d.b2Vec2(0, 10), // gravity
+       true                     // allow sleep
+    );
+
     // create block store
     gBlockStore = new gamejs.sprite.Group();
     for (var i=0; i<NUM_BLOCK_KINDS; i++) {
@@ -52,30 +59,15 @@ function init() {
     gBlockSet = new gamejs.sprite.Group();
     
     // create floor
-    gFloor = new object.floor([0, 640]);
+    gFloor = new object.floor([0, 640], b2World);
 
-    // create Box2D world
-    b2World = new box2d.b2World(
-       new box2d.b2Vec2(0, 10), // gravity
-       true                     // allow sleep
-    );
-
+    //create some objects
     var fixDef = new box2d.b2FixtureDef;
     fixDef.density = 1.0;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.2;
 
     var bodyDef = new box2d.b2BodyDef;
-
-    //create ground
-    bodyDef.type = box2d.b2Body.b2_staticBody;
-    bodyDef.position.x = 9;
-    bodyDef.position.y = 13;
-    fixDef.shape = new box2d.b2PolygonShape;
-    fixDef.shape.SetAsBox(10, 0.5);
-    b2World.CreateBody(bodyDef).CreateFixture(fixDef);
-
-    //create some objects
     bodyDef.type = box2d.b2Body.b2_dynamicBody;
     for(var i = 0; i < 10; ++i) {
         if(Math.random() > 0.5) {
@@ -97,7 +89,7 @@ function init() {
     //setup debug draw
     var debugDraw = new box2d.b2DebugDraw();
     debugDraw.SetSprite(document.getElementById("gjs-canvas").getContext("2d"));
-    debugDraw.SetDrawScale(30.0);
+    debugDraw.SetDrawScale(1.0);
     debugDraw.SetFillAlpha(0.3);
     debugDraw.SetLineThickness(1.0);
     debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
@@ -110,16 +102,14 @@ function update(msDuration) {
     
     input();
     
-    draw();
-         b2World.Step(
-               1 / 60   //frame-rate
-            ,  10       //velocity iterations
-            ,  10       //position iterations
-         );
-         //b2World.DrawDebugData();
-         b2World.ClearForces();
-    
-    
+    b2World.Step(
+        1 / 60,  //frame-rate
+        10,      //velocity iterations
+        10       //position iterations
+    );
+    b2World.ClearForces();
+
+    draw();    
 }
 
 //------------------------------------------------------------------------------
@@ -127,9 +117,13 @@ function update(msDuration) {
 function input() {
     
     gamejs.event.get().forEach(function(event) {
-        if (event.type === gamejs.event.KEY_UP) {
-            if (event.key === gamejs.event.K_UP) {
-                console.log("up pressed");
+        if (event.type === gamejs.event.KEY_DOWN) {
+            if (event.key === gamejs.event.K_b) {
+                b2Draw = true;
+            };
+        } else if (event.type === gamejs.event.KEY_UP) {
+            if (event.key === gamejs.event.K_b) {
+                b2Draw = false;
             };
         } else if (event.type === gamejs.event.MOUSE_DOWN) {
             gBlockStore.forEach(function(block) {
@@ -162,5 +156,9 @@ function draw() {
     if (gBlockPickup) {
         gBlockPickup.draw(mainSurface);
     }
-    gFloor.draw(mainSurface);    
+    gFloor.draw(mainSurface);
+
+    if (b2Draw) {
+        b2World.DrawDebugData();
+    }
 }
