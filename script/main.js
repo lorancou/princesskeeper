@@ -13,15 +13,16 @@ var data = [
 gamejs.preload(data);
 gamejs.ready(main);
 
-var gBlocks = new gamejs.sprite.Group();
+var NUM_BLOCK_KINDS = 4;
+var gBlockStore = new gamejs.sprite.Group();
     
 function main() {
 
     gamejs.display.setMode([1024, 768]);
 
-    gBlocks = new gamejs.sprite.Group();
-    for (var i=0; i<4; i++) {
-        gBlocks.add(new object.block([32 + i*64, 32], i));
+    gBlockStore = new gamejs.sprite.Group();
+    for (var i=0; i<NUM_BLOCK_KINDS; i++) {
+        gBlockStore.add(new object.block([32 + i*64, 32], i));
     }
     
     gamejs.time.fpsCallback(update, this, 60);
@@ -46,17 +47,12 @@ function input() {
                 console.log("up pressed");
             };
         } else if (event.type === gamejs.event.MOUSE_MOTION) {
-            // if mouse is over display surface
-            /*if (displayRect.collidePoint(event.pos)) {
-            // add sparkle at mouse position
-            sparkles.push({
-            left: event.pos[0],
-            top: event.pos[1],
-            alpha: Math.random(),
-            deltaX: 30 - Math.random() * 60,
-            deltaY: 80 + Math.random() * 40,
+            gBlockStore.forEach(function(block) {
+                if (block.rect.collidePoint(event.pos))
+                {
+                    console.log(block.index);
+                }
             });
-            }*/
         }
     });
 }
@@ -64,5 +60,5 @@ function input() {
 function draw() {
     
     var mainSurface = gamejs.display.getSurface();
-    gBlocks.draw(mainSurface);
+    gBlockStore.draw(mainSurface);
 }

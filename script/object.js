@@ -1,11 +1,8 @@
 var gamejs = require('gamejs');
 
-exports.block = function(rect, index) {
+exports.block = function(position, index) {
     
     exports.block.superConstructor.apply(this, arguments);
-
-    this.originalImage = gamejs.image.load("../data/block0" + index + ".png");
-    var dims = this.originalImage.getSize();
 
     /*this.originalImage = gamejs.transform.scale(
                                 this.originalImage,
@@ -13,8 +10,9 @@ exports.block = function(rect, index) {
                         );*/
 
                         // this.rotation = 50 + parseInt(120*Math.random());
-    this.image = this.originalImage;
-    this.rect = new gamejs.Rect(rect);
+    this.image = gamejs.image.load("../data/block0" + index + ".png");
+    this.rect = new gamejs.Rect(position, this.image.getSize());
+    this.index = index;
                         
     return this;
 };
