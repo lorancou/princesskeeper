@@ -25,7 +25,8 @@ var gFloor = null;
 
 //------------------------------------------------------------------------------
 // Box2D stuff
-var b2World;
+var BOX2D_SCALE = 30.0;
+var b2World = null;
 var b2Draw = false;
 
 //------------------------------------------------------------------------------
@@ -33,7 +34,7 @@ var b2Draw = false;
 function main() {
 
     init();
-    gamejs.time.fpsCallback(update, this, 60);
+    gamejs.time.fpsCallback(update, this, 24);
 }
 
 //------------------------------------------------------------------------------
@@ -45,8 +46,8 @@ function init() {
     
     // create Box2D world
     b2World = new box2d.b2World(
-       new box2d.b2Vec2(0, 10), // gravity
-       true                     // allow sleep
+       new box2d.b2Vec2(0, 10),  // gravity
+       true                      // allow sleep
     );
 
     // create block store
@@ -61,35 +62,10 @@ function init() {
     // create floor
     gFloor = new object.floor([0, 640], b2World);
 
-    //create some objects
-    var fixDef = new box2d.b2FixtureDef;
-    fixDef.density = 1.0;
-    fixDef.friction = 0.5;
-    fixDef.restitution = 0.2;
-
-    var bodyDef = new box2d.b2BodyDef;
-    bodyDef.type = box2d.b2Body.b2_dynamicBody;
-    for(var i = 0; i < 10; ++i) {
-        if(Math.random() > 0.5) {
-           fixDef.shape = new box2d.b2PolygonShape;
-           fixDef.shape.SetAsBox(
-                 Math.random() + 0.1 //half width
-              ,  Math.random() + 0.1 //half height
-           );
-        } else {
-           fixDef.shape = new box2d.b2CircleShape(
-              Math.random() + 0.1 //radius
-           );
-        }
-        bodyDef.position.x = Math.random() * 10;
-        bodyDef.position.y = Math.random() * 10;
-        b2World.CreateBody(bodyDef).CreateFixture(fixDef);
-    }
-
     //setup debug draw
     var debugDraw = new box2d.b2DebugDraw();
     debugDraw.SetSprite(document.getElementById("gjs-canvas").getContext("2d"));
-    debugDraw.SetDrawScale(1.0);
+    debugDraw.SetDrawScale(BOX2D_SCALE);
     debugDraw.SetFillAlpha(0.3);
     debugDraw.SetLineThickness(1.0);
     debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
@@ -98,16 +74,22 @@ function init() {
     
 //------------------------------------------------------------------------------
 // gather input then draw
-function update(msDuration) {
+function update(dt) {
     
     input();
     
+    // update physics
     b2World.Step(
-        1 / 60,  //frame-rate
+        1 / 24,  //frame-rate
         10,      //velocity iterations
         10       //position iterations
     );
     b2World.ClearForces();
+    
+    // update block positions
+    gBlockSet.forEach(function(block) {
+        block.update(dt);
+    });
 
     draw();    
 }
@@ -133,6 +115,7 @@ function input() {
             });
         } else if (event.type === gamejs.event.MOUSE_UP) {
             if (gBlockPickup) {
+                gBlockPickup.turnOnPhysics(b2World);
                 gBlockSet.add(gBlockPickup);
                 gBlockPickup = null;
             }
