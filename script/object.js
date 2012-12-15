@@ -1,6 +1,19 @@
 var gamejs = require('gamejs');
 
 //------------------------------------------------------------------------------
+// the floor
+exports.floor = function(position) {
+    
+    exports.floor.superConstructor.apply(this, arguments);
+
+    this.image = gamejs.image.load("../data/floor.png");
+    this.rect = new gamejs.Rect(position, this.image.getSize());
+                        
+    return this;
+};
+gamejs.utils.objects.extend(exports.floor, gamejs.sprite.Sprite);
+
+//------------------------------------------------------------------------------
 // a tower block
 exports.block = function(position, index) {
     
