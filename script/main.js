@@ -4,13 +4,15 @@ var object = require('object');
 
 var data = [
     
-    "./data/block01.png",
-    "./data/block02.png",
+    "../data/block01.png",
+    "../data/block02.png",
 ];
 
 gamejs.preload(data);
 gamejs.ready(main);
 
+var myBlock;
+    
 function main() {
 
     var display = gamejs.display.setMode([1024, 768]);
@@ -18,13 +20,17 @@ function main() {
         (new gamejs.font.Font('30px Sans-serif')).render('TODO: a game')
     );
 
+    myBlock = new object.block([100, 100]);
+    console.log(myBlock.coucou);
+
     gamejs.time.fpsCallback(update, this, 60);
     
-    var myBlock = new object.block();
-    console.log(myBlock.coucou);
 }
 
 function update(msDuration) {
+    
+    var mainSurface = gamejs.display.getSurface();
+    myBlock.draw(mainSurface);
     
     //console.log("update");
     
