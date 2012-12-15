@@ -11,7 +11,7 @@ exports.floor = function(position, b2World) {
 
     // setup sprite
     this.image = gamejs.image.load("../data/floor.png");
-    this.rect = new gamejs.Rect(position, this.image.getSize());
+    this.rect = new gamejs.Rect(position);
     
     // setup physics
     var fixDef = new box2d.b2FixtureDef;
@@ -21,10 +21,10 @@ exports.floor = function(position, b2World) {
     var bodyDef = new box2d.b2BodyDef;
     bodyDef.type = box2d.b2Body.b2_staticBody;
     var center = this.rect.center;
-    bodyDef.position.x = this.rect.center[0] / BOX2D_SCALE;
-    bodyDef.position.y = this.rect.center[1] / BOX2D_SCALE;
+    bodyDef.position.x = (position[0] + this.image.getSize()[0] * 0.5) / BOX2D_SCALE;
+    bodyDef.position.y = (position[1] + this.image.getSize()[1] * 0.5) / BOX2D_SCALE;
     fixDef.shape = new box2d.b2PolygonShape;
-    fixDef.shape.SetAsBox(this.rect.width * 0.5 / BOX2D_SCALE, this.rect.height * 0.5 / BOX2D_SCALE);
+    fixDef.shape.SetAsBox(this.image.getSize()[0] * 0.5 / BOX2D_SCALE, this.image.getSize()[1] * 0.5 / BOX2D_SCALE);
     b2World.CreateBody(bodyDef).CreateFixture(fixDef);
                         
     return this;
@@ -37,8 +37,11 @@ exports.block = function(position, index) {
     
     exports.block.superConstructor.apply(this, arguments);
 
-    this.image = gamejs.image.load("../data/block0" + index + ".png");
+    // setup sprite
+    this.originalImage = gamejs.image.load("../data/block0" + index + ".png");
+    this.image = this.originalImage;
     this.rect = new gamejs.Rect(position, this.image.getSize());
+
     this.index = index;
                         
     return this;
@@ -71,7 +74,9 @@ exports.block.prototype.update = function(dt) {
     
     //debugger;
     if (this.b2Body) {
-        this.rect.x = (this.b2Body.GetPosition().x * BOX2D_SCALE) - this.rect.width/2;
-        this.rect.y = (this.b2Body.GetPosition().y * BOX2D_SCALE) - this.rect.height/2;
+        this.image = gamejs.transform.rotate(this.originalImage, gamejs.utils.math.degrees(this.b2Body.GetAngle()));
+		this.rect.width = 0.0; this.rect.height = 0.0; // forces gamejs to use the rotated image size
+		this.rect.x = (this.b2Body.GetPosition().x * BOX2D_SCALE) - this.image.getSize()[0] * 0.5;
+        this.rect.y = (this.b2Body.GetPosition().y * BOX2D_SCALE) - this.image.getSize()[1] * 0.5;
     }
 }
