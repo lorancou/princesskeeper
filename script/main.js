@@ -8,10 +8,18 @@ var level = require('level');
 // preload everything, call main when done
 var data = [
     
-    "../data/block00.png",
-    "../data/block01.png",
-    "../data/block02.png",
-    "../data/block03.png",
+    "../data/block00_1.png",
+    "../data/block00_2.png",
+    "../data/block00_3.png",
+    "../data/block01_1.png",
+    "../data/block01_2.png",
+    "../data/block01_3.png",
+    "../data/block02_1.png",
+    "../data/block02_2.png",
+    "../data/block02_3.png",
+    "../data/block03_1.png",
+    "../data/block03_2.png",
+    "../data/block03_3.png",
     "../data/knight00.png",
     "../data/knight01.png",
     "../data/princess.png",
@@ -41,7 +49,7 @@ var gBlockSet = null;
 var gBlockPickup = null;
 var gFloor = null;
 var gKnightSet = null;
-var gLevelIndex = 0;
+var gLevelIndex = 3;
 
 //------------------------------------------------------------------------------
 // Box2D stuff
@@ -56,7 +64,7 @@ var gFont = null;
 // entry point
 function main() {
 
-    init(0);
+    init(gLevelIndex);
     gamejs.time.fpsCallback(update, this, 24);
 }
 
@@ -92,7 +100,9 @@ function init(levelIndex) {
 			}
 		} else if (objectA.kind == "knight" && objectB.kind == "block") {
 			objectA.hit = true;
+			objectB.hit();
 		} else if (objectA.kind == "block" && objectB.kind == "knight") {
+			objectA.hit();
 			objectB.hit = true;
 		}
     }
@@ -111,12 +121,14 @@ function init(levelIndex) {
     b2World.SetDebugDraw(debugDraw);
 
     // create block store
+	gBlockStoreCounts = level.constants[levelIndex].blocks.slice(0); // NB: array deep copy http://stackoverflow.com/a/7486130/1005455
     gBlockStore = new gamejs.sprite.Group();
     gBlockStore.add(new object.block([32, 32], "princess"));
     for (var i=0; i<NUM_BLOCK_KINDS; i++) {
-        gBlockStore.add(new object.block([128 + i*64, 32], i));
+		if (gBlockStoreCounts[i] > 0) {
+			gBlockStore.add(new object.block([128 + i*64, 32], i));
+		}
     }
-	gBlockStoreCounts = level.constants[levelIndex].blocks;
     
     // create empty block & knight sets
     gBlockSet = new gamejs.sprite.Group();
@@ -159,6 +171,10 @@ function update(dt) {
     // update gameplay elements
     gBlockSet.forEach(function(block) {
         block.update(dt);
+		if (block.type != "princess" && block.hp == 0) {
+			block.die(b2World);
+			gBlockSet.remove(block);
+		}
     });
     gKnightSet.forEach(function(knight) {
         knight.update(dt);
@@ -241,9 +257,9 @@ function updateDefending(events, dt) {
     if (gStateTimer > gDefendingNextSpawn) {
         
         if (gDefendingNextLeft) {
-            gKnightSet.add(new object.knight([0, 500], 0, b2World, gDefendingNextLeft));
+            gKnightSet.add(new object.knight([0, 600], 0, b2World, gDefendingNextLeft));
         } else {
-            gKnightSet.add(new object.knight([1024-32, 500], 1, b2World, gDefendingNextLeft));
+            gKnightSet.add(new object.knight([1024-32, 600], 1, b2World, gDefendingNextLeft));
         }                
         
         gDefendingNextSpawn += 2000.0;

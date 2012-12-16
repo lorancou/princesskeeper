@@ -1,8 +1,12 @@
 //------------------------------------------------------------------------------
 // levels
 exports.constants = [
-	{ duration: 20000, blocks: [ 4, 3, 2, 1 ] },
-	{ duration: 30000, blocks: [ 5, 3, 2, 0 ] },
-	{ duration: 40000, blocks: [ 0, 0, 2, 5 ] },
-	{ duration: 50000, blocks: [ 0, 0, 20, 10 ] },
+	// level 1
+	{ duration: 10000, blocks: [ 0, 0, 6, 0 ] },
+	// level 2
+	{ duration: 20000, blocks: [ 0, 0, 6, 1 ] },
+	// level 3
+	{ duration: 20000, blocks: [ 0, 8, 2, 0 ] },
+	// level 4
+	{ duration: 30000, blocks: [ 0, 6, 2, 1 ] },
 ];

@@ -45,7 +45,7 @@ exports.block = function(position, index) {
 	if (index == "princess") {
 		this.originalImage = gamejs.image.load("../data/princess.png");
 	} else {
-		this.originalImage = gamejs.image.load("../data/block0" + index + ".png");
+		this.originalImage = gamejs.image.load("../data/block0" + index + "_3.png");
 	}
     this.image = this.originalImage;
     this.rect = new gamejs.Rect(position, this.image.getSize());
@@ -80,6 +80,7 @@ exports.block.prototype.turnOnPhysics = function(b2World) {
 		this.kind = "princess";
 	} else {
 		this.kind = "block";
+		this.hp = 3;
 	}			
 }
 
@@ -99,6 +100,25 @@ exports.block.prototype.update = function(dt) {
 }
 
 //------------------------------------------------------------------------------
+// update tower blocks
+exports.block.prototype.hit = function() {
+	
+	this.hp--;
+	if (this.hp > 0)
+	{
+		this.originalImage = gamejs.image.load("../data/block0" + this.index + "_" + this.hp + ".png");	
+	}
+}
+
+//------------------------------------------------------------------------------
+// block death
+exports.block.prototype.die = function(b2World) {
+    
+	this.b2Body.SetUserData(null);
+	b2World.DestroyBody(this.b2Body);		
+}
+
+//------------------------------------------------------------------------------
 // a knight
 exports.knight = function(position, index, b2World, isLeft) {
     
@@ -112,8 +132,8 @@ exports.knight = function(position, index, b2World, isLeft) {
     this.index = index;
 	
     var fixDef = new box2d.b2FixtureDef;
-    fixDef.density = 1.0;
-    fixDef.friction = 0.5;
+    fixDef.density = 10.0;
+    fixDef.friction = 0.1;
     fixDef.restitution = 0.2;
     var bodyDef = new box2d.b2BodyDef;
     bodyDef.type = box2d.b2Body.b2_dynamicBody;
@@ -130,7 +150,7 @@ exports.knight = function(position, index, b2World, isLeft) {
 	this.hit = false;
 	
 	// initial impulse
-	this.b2Body.ApplyImpulse(new box2d.b2Vec2(isLeft ? 10.0 : -10.0, 0.0), bodyDef.position);
+	this.b2Body.ApplyImpulse(new box2d.b2Vec2(isLeft ? 70.0 : -70.0, 0.0), bodyDef.position);
 	
     return this;
 };
