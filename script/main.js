@@ -143,6 +143,9 @@ function init(levelIndex) {
 	gBlockStoreInventory = level.constants[levelIndex].blocks.slice(0); // NB: array deep copy http://stackoverflow.com/a/7486130/1005455
     gBlockStore = new gamejs.sprite.Group();
 	gBlockStoreYOffsets = new Array();
+	if (gLevelIndex >= 1) {
+		gBlockStore.add(new object.block([20, 166], "princess"));
+	}
 	var currentY = 250;
     for (var i=0; i<NUM_BLOCK_KINDS; i++) {
 		if (gBlockStoreInventory[i] > 0) {
@@ -152,7 +155,6 @@ function init(levelIndex) {
 			currentY += newBlock.image.getSize()[1] + 20;
 		}
     }
-    // gBlockStore.add(new object.block([20, currentY], "princess"));
    
     // create empty block & knight sets
     gBlockSet = new gamejs.sprite.Group();
@@ -293,12 +295,12 @@ function updateBuilding(events, dt) {
                     gDefendingNextSpawn = 2000.0;
                     gDefendingNextLeft = true;
                 } else  {
-					// no more blocks in store, add the princess
+					// no more blocks in store, add the princess (level 0 - tutorial)
 					if (gBlockStore._sprites.length == 0) {
 						if (gLevelIndex == 0) {
 							gMsg = new ui.msg("princess", [150, 220]);
+							gBlockStore.add(new object.block([20, 250], "princess"));
 						}
-						gBlockStore.add(new object.block([20, 250], "princess"));
 					}
 				}
 				
