@@ -1,6 +1,7 @@
 var gamejs = require('gamejs');
 var box2d = require('./Box2dWeb-2.1.a.3');
 var object = require('object');
+var global = require('global');
 
 //------------------------------------------------------------------------------
 // preload everything, call main when done
@@ -10,10 +11,20 @@ var data = [
     "../data/block01.png",
     "../data/block02.png",
     "../data/block03.png",
+    "../data/knight00.png",
+    "../data/knight01.png",
+    "../data/princess.png",
+    "../data/princess.png",
     "../data/floor.png",
 ];
 gamejs.preload(data);
 gamejs.ready(main);
+
+//------------------------------------------------------------------------------
+// game state
+var STATE_BUILDING = 0;
+var STATE_DEFENDING = 1;
+var gState = STATE_BUILDING;
 
 //------------------------------------------------------------------------------
 // gameplay elements
@@ -22,10 +33,11 @@ var gBlockStore = null;
 var gBlockSet = null;
 var gBlockPickup = null;
 var gFloor = null;
+var gKnightSet = null;
+var gLevelIndex = 0;
 
 //------------------------------------------------------------------------------
 // Box2D stuff
-var BOX2D_SCALE = 30.0;
 var b2World = null;
 var b2Draw = false;
 
@@ -52,12 +64,14 @@ function init() {
 
     // create block store
     gBlockStore = new gamejs.sprite.Group();
+	gBlockStore.add(new object.block([32, 32], "princess"));
     for (var i=0; i<NUM_BLOCK_KINDS; i++) {
-        gBlockStore.add(new object.block([32 + i*64, 32], i));
+        gBlockStore.add(new object.block([128 + i*64, 32], i));
     }
     
-    // create empty block set
+    // create empty block & knight sets
     gBlockSet = new gamejs.sprite.Group();
+	gKnightSet = new gamejs.sprite.Group();
     
     // create floor
     gFloor = new object.floor([0, 640], b2World);
@@ -65,7 +79,7 @@ function init() {
     //setup debug draw
     var debugDraw = new box2d.b2DebugDraw();
     debugDraw.SetSprite(document.getElementById("gjs-canvas").getContext("2d"));
-    debugDraw.SetDrawScale(BOX2D_SCALE);
+    debugDraw.SetDrawScale(global.BOX2D_SCALE);
     debugDraw.SetFillAlpha(0.3);
     debugDraw.SetLineThickness(1.0);
     debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
@@ -86,9 +100,12 @@ function update(dt) {
     );
     b2World.ClearForces();
     
-    // update block positions
+    // update gameplay elements
     gBlockSet.forEach(function(block) {
         block.update(dt);
+    });
+    gKnightSet.forEach(function(knight) {
+        knight.update(dt);
     });
 
     draw();    
@@ -110,13 +127,25 @@ function input() {
         } else if (event.type === gamejs.event.MOUSE_DOWN) {
             gBlockStore.forEach(function(block) {
                 if (block.rect.collidePoint(event.pos)) {
-                    gBlockPickup = new object.block(block.rect.topleft, block.index);
+					if (block.index == "princess") {
+						gBlockStore.remove(block);
+						gBlockPickup = block;
+					}
+					else
+					{
+						gBlockPickup = new object.block(block.rect.topleft, block.index);
+					}
                 }
             });
         } else if (event.type === gamejs.event.MOUSE_UP) {
             if (gBlockPickup) {
                 gBlockPickup.turnOnPhysics(b2World);
                 gBlockSet.add(gBlockPickup);
+				if (gBlockPickup.index == "princess") {
+					gState = STATE_DEFENDING;
+					console.log("defending");
+					gKnightSet.add(new object.knight([200, 200], 0, b2World));
+				}
                 gBlockPickup = null;
             }
         } else if (event.type === gamejs.event.MOUSE_MOTION) {
@@ -136,6 +165,7 @@ function draw() {
     var mainSurface = gamejs.display.getSurface();
     gBlockStore.draw(mainSurface);
     gBlockSet.draw(mainSurface);
+    gKnightSet.draw(mainSurface);
     if (gBlockPickup) {
         gBlockPickup.draw(mainSurface);
     }
