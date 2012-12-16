@@ -1,4 +1,5 @@
 var gamejs = require('gamejs');
+var global = require('global');
 
 //------------------------------------------------------------------------------
 // title
@@ -7,7 +8,7 @@ exports.title = function() {
     exports.title.superConstructor.apply(this, arguments);
 
     // setup sprite
-    this.image = gamejs.image.load("../data/title.png");
+    this.image = gamejs.image.load(global.DATA_PATH + "title.png");
     this.rect = new gamejs.Rect([256, 0]);
 
     return this;
@@ -21,7 +22,7 @@ exports.vbar = function(x) {
     exports.vbar.superConstructor.apply(this, arguments);
 
     // setup sprite
-    this.image = gamejs.image.load("../data/vbar.png");
+    this.image = gamejs.image.load(global.DATA_PATH + "vbar.png");
     this.rect = new gamejs.Rect([x, 270]);
 
     return this;
@@ -35,7 +36,7 @@ exports.msg = function(name, position) {
     exports.msg.superConstructor.apply(this, arguments);
 
     // setup sprite
-    this.image = gamejs.image.load("../data/msg_" + name + ".png");
+    this.image = gamejs.image.load(global.DATA_PATH + "msg_" + name + ".png");
     this.rect = new gamejs.Rect(position);
 	
 	this.name = name;

@@ -2,3 +2,4 @@ mongoose-3.3.exe
 mongoose.conf
 progress
 sync.sh
+.syncignore

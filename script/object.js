@@ -1,4 +1,5 @@
 var gamejs = require('gamejs');
+var global = require('global');
 var box2d = require('./Box2dWeb-2.1.a.3');
 var global = require('global');
 
@@ -9,7 +10,7 @@ exports.floor = function(position, b2World) {
     exports.floor.superConstructor.apply(this, arguments);
 
     // setup sprite
-    this.image = gamejs.image.load("../data/floor.png");
+    this.image = gamejs.image.load(global.DATA_PATH + "floor.png");
     this.rect = new gamejs.Rect(position);
     
     // setup physics - aabb is 1024x60
@@ -43,9 +44,9 @@ exports.block = function(position, index) {
 
     // setup sprite
 	if (index == "princess") {
-		this.originalImage = gamejs.image.load("../data/princess.png");
+		this.originalImage = gamejs.image.load(global.DATA_PATH + "princess.png");
 	} else {
-		this.originalImage = gamejs.image.load("../data/block0" + index + "_3.png");
+		this.originalImage = gamejs.image.load(global.DATA_PATH + "block0" + index + "_3.png");
 	}
     this.image = this.originalImage;
     this.rect = new gamejs.Rect(position, this.image.getSize());
@@ -110,7 +111,7 @@ exports.block.prototype.hit = function() {
 	this.hp--;
 	if (this.hp > 0)
 	{
-		this.originalImage = gamejs.image.load("../data/block0" + this.index + "_" + this.hp + ".png");	
+		this.originalImage = gamejs.image.load(global.DATA_PATH + "block0" + this.index + "_" + this.hp + ".png");	
 	}
 }
 
@@ -146,15 +147,15 @@ exports.knight = function(position, index, b2World, isLeft) {
     // setup sprite
 	if (isLeft) {
 		this.originalImage = [
-			gamejs.image.load("../data/knight0" + index + "_0.png"),
-			gamejs.image.load("../data/knight0" + index + "_1.png"),
-			gamejs.image.load("../data/knight0" + index + "_2.png"),
+			gamejs.image.load(global.DATA_PATH + "knight0" + index + "_0.png"),
+			gamejs.image.load(global.DATA_PATH + "knight0" + index + "_1.png"),
+			gamejs.image.load(global.DATA_PATH + "knight0" + index + "_2.png"),
 		];
 	} else {
 		this.originalImage = [
-			gamejs.transform.flip(gamejs.image.load("../data/knight0" + index + "_0.png"), true, false),
-			gamejs.transform.flip(gamejs.image.load("../data/knight0" + index + "_1.png"), true, false),
-			gamejs.transform.flip(gamejs.image.load("../data/knight0" + index + "_2.png"), true, false),
+			gamejs.transform.flip(gamejs.image.load(global.DATA_PATH + "knight0" + index + "_0.png"), true, false),
+			gamejs.transform.flip(gamejs.image.load(global.DATA_PATH + "knight0" + index + "_1.png"), true, false),
+			gamejs.transform.flip(gamejs.image.load(global.DATA_PATH + "knight0" + index + "_2.png"), true, false),
 		];
 	}
     this.image = this.originalImage[this.animFrame];

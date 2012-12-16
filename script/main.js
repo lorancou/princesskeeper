@@ -1,44 +1,43 @@
 var gamejs = require('gamejs');
+var global = require('global');
 var box2d = require('./Box2dWeb-2.1.a.3');
 var object = require('object');
-var global = require('global');
 var level = require('level');
 var ui = require('ui');
 
 //------------------------------------------------------------------------------
 // preload everything, call main when done
 var data = [
-    
-    "../data/block00_1.png",
-    "../data/block00_2.png",
-    "../data/block00_3.png",
-    "../data/block01_1.png",
-    "../data/block01_2.png",
-    "../data/block01_3.png",
-    "../data/block02_1.png",
-    "../data/block02_2.png",
-    "../data/block02_3.png",
-    "../data/block03_1.png",
-    "../data/block03_2.png",
-    "../data/block03_3.png",
-    "../data/msg_crown.png",
-    "../data/msg_drop.png",
-    "../data/msg_end.png",
-    "../data/msg_fail.png",
-    "../data/msg_pick.png",
-    "../data/msg_princess.png",
-    "../data/msg_win.png",
-    "../data/knight00_0.png",
-    "../data/knight00_1.png",
-    "../data/knight00_2.png",
-    "../data/knight01_0.png",
-    "../data/knight01_1.png",
-    "../data/knight01_2.png",
-    "../data/princess.png",
-    "../data/princess.png",
-    "../data/floor.png",
-    "../data/title.png",
-    "../data/vbar.png",
+	global.DATA_PATH + "block00_1.png",
+	global.DATA_PATH + "block00_2.png",
+	global.DATA_PATH + "block00_3.png",
+	global.DATA_PATH + "block01_1.png",
+	global.DATA_PATH + "block01_2.png",
+	global.DATA_PATH + "block01_3.png",
+	global.DATA_PATH + "block02_1.png",
+	global.DATA_PATH + "block02_2.png",
+	global.DATA_PATH + "block02_3.png",
+	global.DATA_PATH + "block03_1.png",
+	global.DATA_PATH + "block03_2.png",
+	global.DATA_PATH + "block03_3.png",
+	global.DATA_PATH + "msg_crown.png",
+	global.DATA_PATH + "msg_drop.png",
+	global.DATA_PATH + "msg_end.png",
+	global.DATA_PATH + "msg_fail.png",
+	global.DATA_PATH + "msg_pick.png",
+	global.DATA_PATH + "msg_princess.png",
+	global.DATA_PATH + "msg_win.png",
+	global.DATA_PATH + "knight00_0.png",
+	global.DATA_PATH + "knight00_1.png",
+	global.DATA_PATH + "knight00_2.png",
+	global.DATA_PATH + "knight01_0.png",
+	global.DATA_PATH + "knight01_1.png",
+	global.DATA_PATH + "knight01_2.png",
+	global.DATA_PATH + "princess.png",
+	global.DATA_PATH + "princess.png",
+	global.DATA_PATH + "floor.png",
+	global.DATA_PATH + "title.png",
+	global.DATA_PATH + "vbar.png",
 ];
 gamejs.preload(data);
 gamejs.ready(main);
