@@ -23,7 +23,13 @@ exports.floor = function(position, b2World) {
     bodyDef.position.y = (position[1] + this.image.getSize()[1] * 0.5) / global.BOX2D_SCALE;
     fixDef.shape = new box2d.b2PolygonShape;
     fixDef.shape.SetAsBox(this.image.getSize()[0] * 0.5 / global.BOX2D_SCALE, this.image.getSize()[1] * 0.5 / global.BOX2D_SCALE);
-    b2World.CreateBody(bodyDef).CreateFixture(fixDef);
+    
+	this.b2Body = b2World.CreateBody(bodyDef);
+	this.b2Body.CreateFixture(fixDef);
+	
+	// store ref for contact callback
+	this.b2Body.SetUserData(this);
+	this.kind = "floor";
                         
     return this;
 };
@@ -67,6 +73,10 @@ exports.block.prototype.turnOnPhysics = function(b2World) {
     
     this.b2Body = b2World.CreateBody(bodyDef);
     this.b2Body.CreateFixture(fixDef);
+	
+	// store ref for contact callback
+	this.b2Body.SetUserData(this);
+	this.kind = "block";
 }
 
 //------------------------------------------------------------------------------
@@ -86,7 +96,7 @@ exports.block.prototype.update = function(dt) {
 
 //------------------------------------------------------------------------------
 // a knight
-exports.knight = function(position, index, b2World) {
+exports.knight = function(position, index, b2World, isLeft) {
     
     exports.knight.superConstructor.apply(this, arguments);
 
@@ -108,8 +118,16 @@ exports.knight = function(position, index, b2World) {
     fixDef.shape = new box2d.b2CircleShape(1.0);
     
     this.b2Body = b2World.CreateBody(bodyDef);
-    this.b2Body.CreateFixture(fixDef);	
-                        
+    this.b2Body.CreateFixture(fixDef);
+	
+	// store ref for contact callback
+	this.b2Body.SetUserData(this);
+	this.kind = "knight";
+	this.hit = false;
+	
+	// initial impulse
+	this.b2Body.ApplyImpulse(new box2d.b2Vec2(isLeft ? 10.0 : -10.0, 0.0), bodyDef.position);
+	
     return this;
 };
 gamejs.utils.objects.extend(exports.knight, gamejs.sprite.Sprite);
@@ -124,3 +142,10 @@ exports.knight.prototype.update = function(dt) {
 	this.rect.y = (this.b2Body.GetPosition().y * global.BOX2D_SCALE) - this.image.getSize()[1] * 0.5;
 }
 
+//------------------------------------------------------------------------------
+// knight death
+exports.knight.prototype.die = function(b2World) {
+    
+	this.b2Body.SetUserData(null);
+	b2World.DestroyBody(this.b2Body);		
+}
