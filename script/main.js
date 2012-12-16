@@ -301,6 +301,9 @@ function draw() {
         case STATE_LOST: drawLost(mainSurface); break;
         case STATE_WIN: drawWin(mainSurface); break;
     }
+	
+	// draw level #
+	mainSurface.blit(gFont.render("LEVEL " + (gLevelIndex + 1)), [970,10]);
 }
 
 //------------------------------------------------------------------------------
