@@ -49,7 +49,7 @@ var gBlockSet = null;
 var gBlockPickup = null;
 var gFloor = null;
 var gKnightSet = null;
-var gLevelIndex = 3;
+var gLevelIndex = 0;
 
 //------------------------------------------------------------------------------
 // Box2D stuff
