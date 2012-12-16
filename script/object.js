@@ -76,7 +76,11 @@ exports.block.prototype.turnOnPhysics = function(b2World) {
 	
 	// store ref for contact callback
 	this.b2Body.SetUserData(this);
-	this.kind = "block";
+	if (this.index == "princess") {
+		this.kind = "princess";
+	} else {
+		this.kind = "block";
+	}			
 }
 
 //------------------------------------------------------------------------------

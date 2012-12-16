@@ -2,6 +2,7 @@ var gamejs = require('gamejs');
 var box2d = require('./Box2dWeb-2.1.a.3');
 var object = require('object');
 var global = require('global');
+var level = require('level');
 
 //------------------------------------------------------------------------------
 // preload everything, call main when done
@@ -24,6 +25,8 @@ gamejs.ready(main);
 // game state
 var STATE_BUILDING = 0;
 var STATE_DEFENDING = 1;
+var STATE_LOST = 2;
+var STATE_WIN = 3;
 var gState = STATE_BUILDING;
 var gDefendingTimer = 0.0;
 var gDefendingNextSpawn = 0.0;
@@ -43,6 +46,10 @@ var gLevelIndex = 0;
 // Box2D stuff
 var b2World = null;
 var b2Draw = false;
+
+//------------------------------------------------------------------------------
+// UI stuff
+var gFont = null;
 
 //------------------------------------------------------------------------------
 // entry point
@@ -78,7 +85,11 @@ function init() {
     listener.PostSolve = function(contact, impulse) {
 		var objectA = contact.GetFixtureA().GetBody().GetUserData();
 		var objectB = contact.GetFixtureB().GetBody().GetUserData();
-        if (objectA.kind == "knight" && objectB.kind == "block") {
+        if ((objectA.kind == "knight" && objectB.kind == "princess") || (objectA.kind == "princess" && objectB.kind == "knight")) {
+			if (gState == STATE_DEFENDING) {
+				gState = STATE_LOST;
+			}
+		} else if (objectA.kind == "knight" && objectB.kind == "block") {
 			objectA.hit = true;
 		} else if (objectA.kind == "block" && objectB.kind == "knight") {
 			objectB.hit = true;
@@ -88,6 +99,15 @@ function init() {
         // PreSolve
     }
     b2World.SetContactListener(listener);
+	
+    // setup debug draw
+    var debugDraw = new box2d.b2DebugDraw();
+    debugDraw.SetSprite(document.getElementById("gjs-canvas").getContext("2d"));
+    debugDraw.SetDrawScale(global.BOX2D_SCALE);
+    debugDraw.SetFillAlpha(0.3);
+    debugDraw.SetLineThickness(1.0);
+    debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
+    b2World.SetDebugDraw(debugDraw);
 
     // create block store
     gBlockStore = new gamejs.sprite.Group();
@@ -103,14 +123,8 @@ function init() {
     // create floor
     gFloor = new object.floor([0, 640], b2World);
 
-    //setup debug draw
-    var debugDraw = new box2d.b2DebugDraw();
-    debugDraw.SetSprite(document.getElementById("gjs-canvas").getContext("2d"));
-    debugDraw.SetDrawScale(global.BOX2D_SCALE);
-    debugDraw.SetFillAlpha(0.3);
-    debugDraw.SetLineThickness(1.0);
-    debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
-    b2World.SetDebugDraw(debugDraw);
+	// create UI
+	gFont = new gamejs.font.Font()
 }
     
 //------------------------------------------------------------------------------
@@ -223,11 +237,17 @@ function updateDefending(events, dt) {
         gDefendingNextLeft = !gDefendingNextLeft;
     }
     
-    gDefendingTimer += dt;
+	var duration = level.constants[gLevelIndex].duration;
+	var timeLeft = (duration - gDefendingTimer) / 1000;
+	if (timeLeft >= 0) {
+		gDefendingTimer += dt;
+	} else {
+		gState = STATE_WIN;
+	}
 }
 
 //------------------------------------------------------------------------------
-// blit
+// draw
 function draw() {
     
     gamejs.display.getSurface().fill('white');
@@ -244,4 +264,43 @@ function draw() {
     if (b2Draw) {
         b2World.DrawDebugData();
     }
+	
+    // draw game state UI
+    switch (gState)
+    {
+        case STATE_BUILDING: drawBuilding(mainSurface); break;
+        case STATE_DEFENDING: drawDefending(mainSurface); break;
+        case STATE_LOST: drawLost(mainSurface); break;
+        case STATE_WIN: drawWin(mainSurface); break;
+    }
+}
+
+//------------------------------------------------------------------------------
+// draw defending
+function drawBuilding(surface) {
+	
+	surface.blit(gFont.render("BUILDING"), [10,10]);
+}
+
+//------------------------------------------------------------------------------
+// draw defending
+function drawDefending(surface) {
+	
+	var duration = level.constants[gLevelIndex].duration;
+	var timeLeft = (duration - gDefendingTimer) / 1000;
+	surface.blit(gFont.render("DEFENDING " + timeLeft), [10,10]);
+}
+
+//------------------------------------------------------------------------------
+// draw lost
+function drawLost(surface) {
+	
+	surface.blit(gFont.render("LOST"), [10,10]);
+}
+
+//------------------------------------------------------------------------------
+// draw win
+function drawWin(surface) {
+	
+	surface.blit(gFont.render("WIN"), [10,10]);
 }
