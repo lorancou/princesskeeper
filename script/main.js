@@ -3,6 +3,7 @@ var box2d = require('./Box2dWeb-2.1.a.3');
 var object = require('object');
 var global = require('global');
 var level = require('level');
+var ui = require('ui');
 
 //------------------------------------------------------------------------------
 // preload everything, call main when done
@@ -29,6 +30,7 @@ var data = [
     "../data/princess.png",
     "../data/princess.png",
     "../data/floor.png",
+    "../data/title.png",
 ];
 gamejs.preload(data);
 gamejs.ready(main);
@@ -48,7 +50,8 @@ var gDefendingNextLeft = true;
 // gameplay elements
 var NUM_BLOCK_KINDS = 4;
 var gBlockStore = null;
-var gBlockStoreCounts = null;
+var gBlockStoreInventory = null;
+var gBlockStoreYOffsets = null;
 var gBlockSet = null;
 var gBlockPickup = null;
 var gFloor = null;
@@ -63,6 +66,7 @@ var b2Draw = false;
 //------------------------------------------------------------------------------
 // UI stuff
 var gFont = null;
+var gTitle = null;
 
 //------------------------------------------------------------------------------
 // entry point
@@ -125,15 +129,20 @@ function init(levelIndex) {
     b2World.SetDebugDraw(debugDraw);
 
     // create block store
-	gBlockStoreCounts = level.constants[levelIndex].blocks.slice(0); // NB: array deep copy http://stackoverflow.com/a/7486130/1005455
+	gBlockStoreInventory = level.constants[levelIndex].blocks.slice(0); // NB: array deep copy http://stackoverflow.com/a/7486130/1005455
     gBlockStore = new gamejs.sprite.Group();
-    gBlockStore.add(new object.block([32, 32], "princess"));
+	gBlockStoreYOffsets = new Array();
+	var currentY = 250;
     for (var i=0; i<NUM_BLOCK_KINDS; i++) {
-		if (gBlockStoreCounts[i] > 0) {
-			gBlockStore.add(new object.block([128 + i*64, 32], i));
+		if (gBlockStoreInventory[i] > 0) {
+			var newBlock = new object.block([40, currentY], i);
+			gBlockStore.add(newBlock);
+			gBlockStoreYOffsets[i] = currentY;
+			currentY += newBlock.image.getSize()[1] + 20;
 		}
     }
-    
+    // gBlockStore.add(new object.block([20, currentY], "princess"));
+   
     // create empty block & knight sets
     gBlockSet = new gamejs.sprite.Group();
     gKnightSet = new gamejs.sprite.Group();
@@ -142,7 +151,8 @@ function init(levelIndex) {
     gFloor = new object.floor([0, 603], b2World);
 
 	// create UI
-	gFont = new gamejs.font.Font()
+	gFont = new gamejs.font.Font();
+	gTitle = new ui.title();
 		
 	gState = STATE_BUILDING;
 }
@@ -222,10 +232,16 @@ function updateBuilding(events, dt) {
                         gBlockPickup = block;
                     } else {
 						// picked a regular block
-						if (0 == (--gBlockStoreCounts[block.index])) {
+						if (0 == (--gBlockStoreInventory[block.index])) {
 							// that was the last one
 							gBlockStore.remove(block);
 							gBlockPickup = block;
+							
+							// no more blocks in store, add the princess
+							if (gBlockStore._sprites.length == 0) {
+								gBlockStore.add(new object.block([20, 250], "princess"));
+							}
+							
 						} else {
 							// there are blocks remaining, create a new instance
 							gBlockPickup = new object.block(block.rect.topleft, block.index);
@@ -326,6 +342,9 @@ function draw() {
         b2World.DrawDebugData();
     }
 	
+	// draw title
+	gTitle.draw(mainSurface);
+	
     // draw game state UI
     switch (gState)
     {
@@ -347,8 +366,8 @@ function drawBuilding(surface) {
 	
 	// draw remaining blocks count
 	for (var i=0; i<NUM_BLOCK_KINDS; ++i) {
-		if (gBlockStoreCounts[i] > 0) {
-			surface.blit(gFont.render(gBlockStoreCounts[i]), [128 + i*64, 32]);
+		if (gBlockStoreInventory[i] > 0) {
+			surface.blit(gFont.render("" + gBlockStoreInventory[i] + " x"), [20, gBlockStoreYOffsets[i] + 15]);
 		}
 	}
 	
