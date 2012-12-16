@@ -21,6 +21,13 @@ var data = [
     "../data/block03_1.png",
     "../data/block03_2.png",
     "../data/block03_3.png",
+    "../data/msg_crown.png",
+    "../data/msg_drop.png",
+    "../data/msg_end.png",
+    "../data/msg_fail.png",
+    "../data/msg_pick.png",
+    "../data/msg_princess.png",
+    "../data/msg_win.png",
     "../data/knight00_0.png",
     "../data/knight00_1.png",
     "../data/knight00_2.png",
@@ -70,6 +77,7 @@ var gFont = null;
 var gTitle = null;
 var gVBarLeft = null;
 var gVBarRight = null;
+var gMsg = null;
 
 //------------------------------------------------------------------------------
 // entry point
@@ -108,6 +116,7 @@ function init(levelIndex) {
         if ((objectA.kind == "knight" && objectB.kind == "princess") || (objectA.kind == "princess" && objectB.kind == "knight")) {
 			if (gState == STATE_DEFENDING) {
 				gState = STATE_LOST;
+				gMsg = new ui.msg("fail", [300, 200]);		
 			}
 		} else if (objectA.kind == "knight" && objectB.kind == "block") {
 			objectA.hit = true;
@@ -158,6 +167,10 @@ function init(levelIndex) {
 	gTitle = new ui.title();
 	gVBarLeft = new ui.vbar(512 - level.constants[gLevelIndex].dropAreaWidth * 0.5);
 	gVBarRight = new ui.vbar(512 + level.constants[gLevelIndex].dropAreaWidth * 0.5);
+	
+	if (levelIndex == 0) {
+		gMsg = new ui.msg("pick", [150, 180]);
+	}
 		
 	gState = STATE_BUILDING;
 }
@@ -234,6 +247,7 @@ function debugInput(events) {
 function updateBuilding(events, dt) {
     
     events.forEach(function(event) {
+		// block picking
         if (event.type === gamejs.event.MOUSE_DOWN) {
             gBlockStore.forEach(function(block) {
                 if (block.rect.collidePoint(event.pos)) {
@@ -241,17 +255,21 @@ function updateBuilding(events, dt) {
 						// picked a princess
                         gBlockStore.remove(block);
                         gBlockPickup = block;
+						
+						if (gLevelIndex == 0) {
+							gMsg = new ui.msg("crown", [410, 150]);
+						}
                     } else {
+						
+						if (gMsg) {
+							gMsg = new ui.msg("drop", [410, 150]);
+						}
+						
 						// picked a regular block
 						if (0 == (--gBlockStoreInventory[block.index])) {
 							// that was the last one
 							gBlockStore.remove(block);
 							gBlockPickup = block;
-							
-							// no more blocks in store, add the princess
-							if (gBlockStore._sprites.length == 0) {
-								gBlockStore.add(new object.block([20, 250], "princess"));
-							}
 							
 						} else {
 							// there are blocks remaining, create a new instance
@@ -260,8 +278,13 @@ function updateBuilding(events, dt) {
                     }
                 }
             });
+		// block dropping
         } else if (event.type === gamejs.event.MOUSE_UP) {
             if (gBlockPickup) {
+				if (gMsg) {
+					gMsg = null;
+				}
+				
                 gBlockPickup.turnOnPhysics(b2World);
                 gBlockSet.add(gBlockPickup);
                 if (gBlockPickup.index == "princess") {
@@ -270,9 +293,19 @@ function updateBuilding(events, dt) {
                     gStateTimer = 0.0;
                     gDefendingNextSpawn = 2000.0;
                     gDefendingNextLeft = true;
-                }
+                } else  {
+					// no more blocks in store, add the princess
+					if (gBlockStore._sprites.length == 0) {
+						if (gLevelIndex == 0) {
+							gMsg = new ui.msg("princess", [150, 220]);
+						}
+						gBlockStore.add(new object.block([20, 250], "princess"));
+					}
+				}
+				
                 gBlockPickup = null;
             }
+		// block dragging
         } else if (event.type === gamejs.event.MOUSE_MOTION) {
             if (gBlockPickup) {
                 gBlockPickup.rect.center = event.pos;
@@ -302,6 +335,11 @@ function updateDefending(events, dt) {
 	var duration = level.constants[gLevelIndex].duration;
 	var timeLeft = (duration - gStateTimer) / 1000;
 	if (timeLeft < 0) {
+		if (gLevelIndex == (level.constants.length-1)) {
+			gMsg = new ui.msg("end", [260, 180]);
+		} else {
+			gMsg = new ui.msg("win", [300, 200]);
+		}
 		gState = STATE_WIN;
 	}
 }
@@ -310,26 +348,47 @@ function updateDefending(events, dt) {
 // lost state
 function updateLost(events, dt) {
 	
+	var restart = false;
     events.forEach(function(event) {
         if (event.type === gamejs.event.KEY_UP) {
             if (event.key === gamejs.event.K_SPACE) {
-                init(gLevelIndex);
+                restart = true;
             };
+        } else if (event.type === gamejs.event.MOUSE_UP) {
+			restart = true;
         }
-    });	
+    });
+	
+	if (restart) {
+		gMsg = null;
+		init(gLevelIndex);
+	}
 }
 
 //------------------------------------------------------------------------------
 // win state
 function updateWin(events, dt) {
+
+	// skip, the game is finished
+	if (gLevelIndex == (level.constants.length-1)) {
+		return;
+	}
 	
+	var next = false;
     events.forEach(function(event) {
         if (event.type === gamejs.event.KEY_UP) {
             if (event.key === gamejs.event.K_SPACE) {
-                init(++gLevelIndex);
+				next = true;
             };
+        } else if (event.type === gamejs.event.MOUSE_UP) {
+			next = true;
         }
     });	
+	
+	if (next) {
+		gMsg = null;
+		init(++gLevelIndex);
+	}		
 }
 
 //------------------------------------------------------------------------------
@@ -347,6 +406,11 @@ function draw() {
 	}
 
     gFloor.draw(mainSurface);
+
+	// draw message
+	if (gMsg) {
+		gMsg.draw(mainSurface);
+	}
 
 	if (gBlockPickup) {
         gBlockPickup.draw(mainSurface);

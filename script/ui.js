@@ -27,3 +27,19 @@ exports.vbar = function(x) {
     return this;
 };
 gamejs.utils.objects.extend(exports.vbar, gamejs.sprite.Sprite);
+
+//------------------------------------------------------------------------------
+// message
+exports.msg = function(name, position) {
+    
+    exports.msg.superConstructor.apply(this, arguments);
+
+    // setup sprite
+    this.image = gamejs.image.load("../data/msg_" + name + ".png");
+    this.rect = new gamejs.Rect(position);
+	
+	this.name = name;
+
+    return this;
+};
+gamejs.utils.objects.extend(exports.msg, gamejs.sprite.Sprite);
