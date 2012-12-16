@@ -12,7 +12,7 @@ exports.floor = function(position, b2World) {
     this.image = gamejs.image.load("../data/floor.png");
     this.rect = new gamejs.Rect(position);
     
-    // setup physics - aabb is 1024x36
+    // setup physics - aabb is 1024x60
     var fixDef = new box2d.b2FixtureDef;
     fixDef.density = 1.0;
     fixDef.friction = 0.5;
@@ -20,9 +20,9 @@ exports.floor = function(position, b2World) {
     var bodyDef = new box2d.b2BodyDef;
     bodyDef.type = box2d.b2Body.b2_staticBody;
     bodyDef.position.x = 512 / global.BOX2D_SCALE;
-    bodyDef.position.y = 750 / global.BOX2D_SCALE; // 768 - 18
+    bodyDef.position.y = 738 / global.BOX2D_SCALE; // 768 - 30
     fixDef.shape = new box2d.b2PolygonShape;
-    fixDef.shape.SetAsBox(512 / global.BOX2D_SCALE, 18 / global.BOX2D_SCALE);
+    fixDef.shape.SetAsBox(512 / global.BOX2D_SCALE, 30 / global.BOX2D_SCALE);
     
 	this.b2Body = b2World.CreateBody(bodyDef);
 	this.b2Body.CreateFixture(fixDef);
@@ -69,7 +69,11 @@ exports.block.prototype.turnOnPhysics = function(b2World) {
     bodyDef.position.x = this.rect.center[0] / global.BOX2D_SCALE;
     bodyDef.position.y = this.rect.center[1] / global.BOX2D_SCALE;
     fixDef.shape = new box2d.b2PolygonShape;
-    fixDef.shape.SetAsBox(this.rect.width * 0.5 / global.BOX2D_SCALE, this.rect.height * 0.5 / global.BOX2D_SCALE);
+	var B2PADDING = 4;
+    fixDef.shape.SetAsBox(
+		(this.rect.width - B2PADDING) * 0.5 / global.BOX2D_SCALE,
+		(this.rect.height - B2PADDING) * 0.5 / global.BOX2D_SCALE
+		);
     
     this.b2Body = b2World.CreateBody(bodyDef);
     this.b2Body.CreateFixture(fixDef);
