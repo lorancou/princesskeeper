@@ -25,6 +25,9 @@ gamejs.ready(main);
 var STATE_BUILDING = 0;
 var STATE_DEFENDING = 1;
 var gState = STATE_BUILDING;
+var gDefendingTimer = 0.0;
+var gDefendingNextSpawn = 0.0;
+var gDefendingNextLeft = true;
 
 //------------------------------------------------------------------------------
 // gameplay elements
@@ -159,9 +162,12 @@ function updateBuilding(events, dt) {
                 gBlockPickup.turnOnPhysics(b2World);
                 gBlockSet.add(gBlockPickup);
 				if (gBlockPickup.index == "princess") {
+					// switch to defending state!
 					gState = STATE_DEFENDING;
+					gDefendingTimer = 0.0;
+					gDefendingNextSpawn = 2000.0;
+					gDefendingNextLeft = true;
 					console.log("defending");
-					gKnightSet.add(new object.knight([200, 200], 0, b2World));
 				}
                 gBlockPickup = null;
             }
@@ -176,7 +182,20 @@ function updateBuilding(events, dt) {
 //------------------------------------------------------------------------------
 // defending state
 function updateDefending(events, dt) {
+
+	if (gDefendingTimer > gDefendingNextSpawn) {
+		
+		if (gDefendingNextLeft) {
+			gKnightSet.add(new object.knight([0, 500], 0, b2World));
+		} else {
+			gKnightSet.add(new object.knight([1024-32, 500], 1, b2World));
+		}				
+		
+		gDefendingNextSpawn += 2000.0;
+		gDefendingNextLeft = !gDefendingNextLeft;
+	}
 	
+	gDefendingTimer += dt;
 }
 
 //------------------------------------------------------------------------------
