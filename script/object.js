@@ -119,7 +119,7 @@ exports.knight = function(position, index, b2World, isLeft) {
     bodyDef.type = box2d.b2Body.b2_dynamicBody;
     bodyDef.position.x = this.rect.center[0] / global.BOX2D_SCALE;
     bodyDef.position.y = this.rect.center[1] / global.BOX2D_SCALE;
-    fixDef.shape = new box2d.b2CircleShape(1.0);
+    fixDef.shape = new box2d.b2CircleShape(0.6);
     
     this.b2Body = b2World.CreateBody(bodyDef);
     this.b2Body.CreateFixture(fixDef);

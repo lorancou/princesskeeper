@@ -36,6 +36,7 @@ var gDefendingNextLeft = true;
 // gameplay elements
 var NUM_BLOCK_KINDS = 4;
 var gBlockStore = null;
+var gBlockStoreCounts = null;
 var gBlockSet = null;
 var gBlockPickup = null;
 var gFloor = null;
@@ -115,6 +116,7 @@ function init(levelIndex) {
     for (var i=0; i<NUM_BLOCK_KINDS; i++) {
         gBlockStore.add(new object.block([128 + i*64, 32], i));
     }
+	gBlockStoreCounts = level.constants[levelIndex].blocks;
     
     // create empty block & knight sets
     gBlockSet = new gamejs.sprite.Group();
@@ -195,12 +197,19 @@ function updateBuilding(events, dt) {
             gBlockStore.forEach(function(block) {
                 if (block.rect.collidePoint(event.pos)) {
                     if (block.index == "princess") {
+						// picked a princess
                         gBlockStore.remove(block);
                         gBlockPickup = block;
-                    }
-                    else
-                    {
-                        gBlockPickup = new object.block(block.rect.topleft, block.index);
+                    } else {
+						// picked a regular block
+						if (0 == (--gBlockStoreCounts[block.index])) {
+							// that was the last one
+							gBlockStore.remove(block);
+							gBlockPickup = block;
+						} else {
+							// there are blocks remaining, create a new instance
+							gBlockPickup = new object.block(block.rect.topleft, block.index);
+						}
                     }
                 }
             });
@@ -279,14 +288,16 @@ function updateWin(events, dt) {
 function draw() {
     
     gamejs.display.getSurface().fill('white');
-    
     var mainSurface = gamejs.display.getSurface();
-    gBlockStore.draw(mainSurface);
-    gBlockSet.draw(mainSurface);
-    gKnightSet.draw(mainSurface);
-    if (gBlockPickup) {
+
+	if (gBlockPickup) {
         gBlockPickup.draw(mainSurface);
     }
+
+	gBlockSet.draw(mainSurface);
+    
+	gKnightSet.draw(mainSurface);
+    
     gFloor.draw(mainSurface);
 
     if (b2Draw) {
@@ -309,6 +320,15 @@ function draw() {
 //------------------------------------------------------------------------------
 // draw defending
 function drawBuilding(surface) {
+	
+	gBlockStore.draw(surface);
+	
+	// draw remaining blocks count
+	for (var i=0; i<NUM_BLOCK_KINDS; ++i) {
+		if (gBlockStoreCounts[i] > 0) {
+			surface.blit(gFont.render(gBlockStoreCounts[i]), [128 + i*64, 32]);
+		}
+	}
 	
 	surface.blit(gFont.render("BUILDING"), [10,10]);
 }
