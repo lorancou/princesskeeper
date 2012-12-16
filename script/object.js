@@ -12,17 +12,17 @@ exports.floor = function(position, b2World) {
     this.image = gamejs.image.load("../data/floor.png");
     this.rect = new gamejs.Rect(position);
     
-    // setup physics
+    // setup physics - aabb is 1024x36
     var fixDef = new box2d.b2FixtureDef;
     fixDef.density = 1.0;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.2;
     var bodyDef = new box2d.b2BodyDef;
     bodyDef.type = box2d.b2Body.b2_staticBody;
-    bodyDef.position.x = (position[0] + this.image.getSize()[0] * 0.5) / global.BOX2D_SCALE;
-    bodyDef.position.y = (position[1] + this.image.getSize()[1] * 0.5) / global.BOX2D_SCALE;
+    bodyDef.position.x = 512 / global.BOX2D_SCALE;
+    bodyDef.position.y = 750 / global.BOX2D_SCALE; // 768 - 18
     fixDef.shape = new box2d.b2PolygonShape;
-    fixDef.shape.SetAsBox(this.image.getSize()[0] * 0.5 / global.BOX2D_SCALE, this.image.getSize()[1] * 0.5 / global.BOX2D_SCALE);
+    fixDef.shape.SetAsBox(512 / global.BOX2D_SCALE, 18 / global.BOX2D_SCALE);
     
 	this.b2Body = b2World.CreateBody(bodyDef);
 	this.b2Body.CreateFixture(fixDef);

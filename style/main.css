@@ -14,7 +14,4 @@ body{
 #gjs-canvas {
     width: 1024px;
     height: 768px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
 }

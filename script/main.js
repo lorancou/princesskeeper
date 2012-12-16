@@ -135,7 +135,7 @@ function init(levelIndex) {
     gKnightSet = new gamejs.sprite.Group();
     
     // create floor
-    gFloor = new object.floor([0, 640], b2World);
+    gFloor = new object.floor([0, 668], b2World);
 
 	// create UI
 	gFont = new gamejs.font.Font()
@@ -257,9 +257,9 @@ function updateDefending(events, dt) {
     if (gStateTimer > gDefendingNextSpawn) {
         
         if (gDefendingNextLeft) {
-            gKnightSet.add(new object.knight([0, 600], 0, b2World, gDefendingNextLeft));
+            gKnightSet.add(new object.knight([0, 730], 0, b2World, gDefendingNextLeft));
         } else {
-            gKnightSet.add(new object.knight([1024-32, 600], 1, b2World, gDefendingNextLeft));
+            gKnightSet.add(new object.knight([1024-32, 730], 1, b2World, gDefendingNextLeft));
         }                
         
         gDefendingNextSpawn += 2000.0;
@@ -306,6 +306,8 @@ function draw() {
     gamejs.display.getSurface().fill('white');
     var mainSurface = gamejs.display.getSurface();
 
+    gFloor.draw(mainSurface);
+
 	if (gBlockPickup) {
         gBlockPickup.draw(mainSurface);
     }
@@ -314,8 +316,6 @@ function draw() {
     
 	gKnightSet.draw(mainSurface);
     
-    gFloor.draw(mainSurface);
-
     if (b2Draw) {
         b2World.DrawDebugData();
     }
