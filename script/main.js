@@ -90,7 +90,15 @@ function init() {
 // gather input then draw
 function update(dt) {
     
-    input();
+	var events = gamejs.event.get();
+    debugInput(events);
+    
+	// update game state
+	switch (gState)
+	{
+		case STATE_BUILDING: updateBuilding(events, dt); break;
+		case STATE_DEFENDING: updateDefending(events, dt); break;
+	}
     
     // update physics
     b2World.Step(
@@ -99,7 +107,7 @@ function update(dt) {
         10       //position iterations
     );
     b2World.ClearForces();
-    
+
     // update gameplay elements
     gBlockSet.forEach(function(block) {
         block.update(dt);
@@ -112,10 +120,10 @@ function update(dt) {
 }
 
 //------------------------------------------------------------------------------
-// handle key / mouse events
-function input() {
+// debug keys
+function debugInput(events) {
     
-    gamejs.event.get().forEach(function(event) {
+    events.forEach(function(event) {
         if (event.type === gamejs.event.KEY_DOWN) {
             if (event.key === gamejs.event.K_b) {
                 b2Draw = true;
@@ -124,7 +132,16 @@ function input() {
             if (event.key === gamejs.event.K_b) {
                 b2Draw = false;
             };
-        } else if (event.type === gamejs.event.MOUSE_DOWN) {
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+// building state
+function updateBuilding(events, dt) {
+	
+    events.forEach(function(event) {
+        if (event.type === gamejs.event.MOUSE_DOWN) {
             gBlockStore.forEach(function(block) {
                 if (block.rect.collidePoint(event.pos)) {
 					if (block.index == "princess") {
@@ -154,6 +171,12 @@ function input() {
             }
         }
     });
+}
+
+//------------------------------------------------------------------------------
+// defending state
+function updateDefending(events, dt) {
+	
 }
 
 //------------------------------------------------------------------------------
