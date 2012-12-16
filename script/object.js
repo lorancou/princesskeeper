@@ -100,7 +100,7 @@ exports.block.prototype.update = function(dt) {
 	this.image = gamejs.transform.rotate(this.originalImage, gamejs.utils.math.degrees(this.b2Body.GetAngle()));
 	this.rect.width = 0.0; this.rect.height = 0.0; // forces gamejs to use the rotated image size
 	this.rect.x = (this.b2Body.GetPosition().x * global.BOX2D_SCALE) - this.image.getSize()[0] * 0.5;
-	this.rect.y = (this.b2Body.GetPosition().y * global.BOX2D_SCALE) - this.image.getSize()[1] * 0.5;	
+	this.rect.y = (this.b2Body.GetPosition().y * global.BOX2D_SCALE) - this.image.getSize()[1] * 0.5;
 }
 
 //------------------------------------------------------------------------------
@@ -120,6 +120,17 @@ exports.block.prototype.die = function(b2World) {
     
 	this.b2Body.SetUserData(null);
 	b2World.DestroyBody(this.b2Body);		
+}
+
+//------------------------------------------------------------------------------
+// drop area check
+exports.block.prototype.checkDropArea = function(dropAreaWidth) {
+    
+	if (this.rect.x < (512 - dropAreaWidth * 0.5)) {
+		this.hit();
+	} else if ((this.rect.x + this.image.getSize()[0]) > (512 + dropAreaWidth * 0.5)) {
+		this.hit();
+	}
 }
 
 //------------------------------------------------------------------------------

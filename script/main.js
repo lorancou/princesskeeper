@@ -31,6 +31,7 @@ var data = [
     "../data/princess.png",
     "../data/floor.png",
     "../data/title.png",
+    "../data/vbar.png",
 ];
 gamejs.preload(data);
 gamejs.ready(main);
@@ -67,6 +68,8 @@ var b2Draw = false;
 // UI stuff
 var gFont = null;
 var gTitle = null;
+var gVBarLeft = null;
+var gVBarRight = null;
 
 //------------------------------------------------------------------------------
 // entry point
@@ -153,6 +156,8 @@ function init(levelIndex) {
 	// create UI
 	gFont = new gamejs.font.Font();
 	gTitle = new ui.title();
+	gVBarLeft = new ui.vbar(512 - level.constants[gLevelIndex].dropAreaWidth * 0.5);
+	gVBarRight = new ui.vbar(512 + level.constants[gLevelIndex].dropAreaWidth * 0.5);
 		
 	gState = STATE_BUILDING;
 }
@@ -163,7 +168,7 @@ function update(dt) {
     
     var events = gamejs.event.get();
     debugInput(events);
-    
+
     // update game state
     switch (gState)
     {
@@ -173,7 +178,7 @@ function update(dt) {
         case STATE_WIN: updateWin(events, dt); break;
     }
 	gStateTimer += dt;
-    
+
     // update physics
     b2World.Step(
         1 / 24,  //frame-rate
@@ -185,6 +190,12 @@ function update(dt) {
     // update gameplay elements
     gBlockSet.forEach(function(block) {
         block.update(dt);
+		
+		// in building state, hit blocks getting outside the drop area
+		if (gState == STATE_BUILDING) {
+			block.checkDropArea(level.constants[gLevelIndex].dropAreaWidth);
+		}
+		
 		if (block.type != "princess" && block.hp == 0) {
 			block.die(b2World);
 			gBlockSet.remove(block);
@@ -327,6 +338,13 @@ function draw() {
     
     gamejs.display.getSurface().fill('white');
     var mainSurface = gamejs.display.getSurface();
+
+	// those need to be drawn before the floor
+	if (gState == STATE_BUILDING)
+	{
+		gVBarLeft.draw(mainSurface);
+		gVBarRight.draw(mainSurface);
+	}
 
     gFloor.draw(mainSurface);
 
