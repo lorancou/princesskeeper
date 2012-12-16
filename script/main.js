@@ -167,7 +167,7 @@ function updateBuilding(events, dt) {
             }
         } else if (event.type === gamejs.event.MOUSE_MOTION) {
             if (gBlockPickup) {
-                gBlockPickup.rect.topleft = event.pos;
+                gBlockPickup.rect.center = event.pos;
             }
         }
     });
