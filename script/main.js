@@ -20,8 +20,12 @@ var data = [
     "../data/block03_1.png",
     "../data/block03_2.png",
     "../data/block03_3.png",
-    "../data/knight00.png",
-    "../data/knight01.png",
+    "../data/knight00_0.png",
+    "../data/knight00_1.png",
+    "../data/knight00_2.png",
+    "../data/knight01_0.png",
+    "../data/knight01_1.png",
+    "../data/knight01_2.png",
     "../data/princess.png",
     "../data/princess.png",
     "../data/floor.png",
@@ -256,10 +260,12 @@ function updateDefending(events, dt) {
 
     if (gStateTimer > gDefendingNextSpawn) {
         
+		// spawn knights
+		var knightIndex = Math.random() < 0.1 ? 1 : 0; // spawn a goat once in a while
         if (gDefendingNextLeft) {
-            gKnightSet.add(new object.knight([0, 690], 0, b2World, gDefendingNextLeft));
+            gKnightSet.add(new object.knight([0, 630], knightIndex, b2World, gDefendingNextLeft));
         } else {
-            gKnightSet.add(new object.knight([1024-32, 690], 1, b2World, gDefendingNextLeft));
+            gKnightSet.add(new object.knight([1024-80, 630], knightIndex, b2World, gDefendingNextLeft));
         }                
         
         gDefendingNextSpawn += 2000.0;

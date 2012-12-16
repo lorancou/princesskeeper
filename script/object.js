@@ -127,10 +127,26 @@ exports.block.prototype.die = function(b2World) {
 exports.knight = function(position, index, b2World, isLeft) {
     
     exports.knight.superConstructor.apply(this, arguments);
+	
+	this.animFrame = 0;
+	this.animTime = 0;
+	this.ANIM_DELTA = 100;
 
     // setup sprite
-	this.originalImage = gamejs.image.load("../data/knight0" + index + ".png");
-    this.image = this.originalImage;
+	if (isLeft) {
+		this.originalImage = [
+			gamejs.image.load("../data/knight0" + index + "_0.png"),
+			gamejs.image.load("../data/knight0" + index + "_1.png"),
+			gamejs.image.load("../data/knight0" + index + "_2.png"),
+		];
+	} else {
+		this.originalImage = [
+			gamejs.transform.flip(gamejs.image.load("../data/knight0" + index + "_0.png"), true, false),
+			gamejs.transform.flip(gamejs.image.load("../data/knight0" + index + "_1.png"), true, false),
+			gamejs.transform.flip(gamejs.image.load("../data/knight0" + index + "_2.png"), true, false),
+		];
+	}
+    this.image = this.originalImage[this.animFrame];
     this.rect = new gamejs.Rect(position, this.image.getSize());
 
     this.index = index;
@@ -143,7 +159,7 @@ exports.knight = function(position, index, b2World, isLeft) {
     bodyDef.type = box2d.b2Body.b2_dynamicBody;
     bodyDef.position.x = this.rect.center[0] / global.BOX2D_SCALE;
     bodyDef.position.y = this.rect.center[1] / global.BOX2D_SCALE;
-    fixDef.shape = new box2d.b2CircleShape(0.6);
+    fixDef.shape = new box2d.b2CircleShape(1.0);
     
     this.b2Body = b2World.CreateBody(bodyDef);
     this.b2Body.CreateFixture(fixDef);
@@ -154,7 +170,7 @@ exports.knight = function(position, index, b2World, isLeft) {
 	this.hit = false;
 	
 	// initial impulse
-	this.b2Body.ApplyImpulse(new box2d.b2Vec2(isLeft ? 70.0 : -70.0, 0.0), bodyDef.position);
+	this.b2Body.ApplyImpulse(new box2d.b2Vec2(isLeft ? 100.0 : -100.0, 0.0), bodyDef.position);
 	
     return this;
 };
@@ -164,6 +180,15 @@ gamejs.utils.objects.extend(exports.knight, gamejs.sprite.Sprite);
 // update knights
 exports.knight.prototype.update = function(dt) {
     
+	// 3 frames anim
+	this.animTime += dt;
+	if (this.animTime > this.ANIM_DELTA)
+	{
+		this.animTime -= this.ANIM_DELTA;
+		this.animFrame = (this.animFrame + 1) % 3;
+		this.image = this.originalImage[this.animFrame];
+	}
+	
 	//this.image = gamejs.transform.rotate(this.originalImage, gamejs.utils.math.degrees(this.b2Body.GetAngle()));
 	//this.rect.width = 0.0; this.rect.height = 0.0; // forces gamejs to use the rotated image size
 	this.rect.x = (this.b2Body.GetPosition().x * global.BOX2D_SCALE) - this.image.getSize()[0] * 0.5;
