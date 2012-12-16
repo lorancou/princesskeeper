@@ -28,7 +28,7 @@ var STATE_DEFENDING = 1;
 var STATE_LOST = 2;
 var STATE_WIN = 3;
 var gState = STATE_BUILDING;
-var gDefendingTimer = 0.0;
+var gStateTimer = 0.0;
 var gDefendingNextSpawn = 0.0;
 var gDefendingNextLeft = true;
 
@@ -55,13 +55,13 @@ var gFont = null;
 // entry point
 function main() {
 
-    init();
+    init(0);
     gamejs.time.fpsCallback(update, this, 24);
 }
 
 //------------------------------------------------------------------------------
 // create everything
-function init() {
+function init(levelIndex) {
 
     // set display size
     gamejs.display.setMode([1024, 768]);
@@ -125,6 +125,8 @@ function init() {
 
 	// create UI
 	gFont = new gamejs.font.Font()
+		
+	gState = STATE_BUILDING;
 }
     
 //------------------------------------------------------------------------------
@@ -139,7 +141,10 @@ function update(dt) {
     {
         case STATE_BUILDING: updateBuilding(events, dt); break;
         case STATE_DEFENDING: updateDefending(events, dt); break;
+        case STATE_LOST: updateLost(events, dt); break;
+        case STATE_WIN: updateWin(events, dt); break;
     }
+	gStateTimer += dt;
     
     // update physics
     b2World.Step(
@@ -206,10 +211,9 @@ function updateBuilding(events, dt) {
                 if (gBlockPickup.index == "princess") {
                     // switch to defending state!
                     gState = STATE_DEFENDING;
-                    gDefendingTimer = 0.0;
+                    gStateTimer = 0.0;
                     gDefendingNextSpawn = 2000.0;
                     gDefendingNextLeft = true;
-                    console.log("defending");
                 }
                 gBlockPickup = null;
             }
@@ -225,7 +229,7 @@ function updateBuilding(events, dt) {
 // defending state
 function updateDefending(events, dt) {
 
-    if (gDefendingTimer > gDefendingNextSpawn) {
+    if (gStateTimer > gDefendingNextSpawn) {
         
         if (gDefendingNextLeft) {
             gKnightSet.add(new object.knight([0, 500], 0, b2World, gDefendingNextLeft));
@@ -238,12 +242,36 @@ function updateDefending(events, dt) {
     }
     
 	var duration = level.constants[gLevelIndex].duration;
-	var timeLeft = (duration - gDefendingTimer) / 1000;
-	if (timeLeft >= 0) {
-		gDefendingTimer += dt;
-	} else {
+	var timeLeft = (duration - gStateTimer) / 1000;
+	if (timeLeft < 0) {
 		gState = STATE_WIN;
 	}
+}
+
+//------------------------------------------------------------------------------
+// lost state
+function updateLost(events, dt) {
+	
+    events.forEach(function(event) {
+        if (event.type === gamejs.event.KEY_UP) {
+            if (event.key === gamejs.event.K_SPACE) {
+                init(gLevelIndex);
+            };
+        }
+    });	
+}
+
+//------------------------------------------------------------------------------
+// win state
+function updateWin(events, dt) {
+	
+    events.forEach(function(event) {
+        if (event.type === gamejs.event.KEY_UP) {
+            if (event.key === gamejs.event.K_SPACE) {
+                init(++gLevelIndex);
+            };
+        }
+    });	
 }
 
 //------------------------------------------------------------------------------
@@ -287,7 +315,7 @@ function drawBuilding(surface) {
 function drawDefending(surface) {
 	
 	var duration = level.constants[gLevelIndex].duration;
-	var timeLeft = (duration - gDefendingTimer) / 1000;
+	var timeLeft = (duration - gStateTimer) / 1000;
 	surface.blit(gFont.render("DEFENDING " + timeLeft), [10,10]);
 }
 
