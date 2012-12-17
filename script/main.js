@@ -8,8 +8,10 @@ var ui = require('ui');
 //------------------------------------------------------------------------------
 // IE doesn't take Ogg
 var AUDIO_EXT = ".ogg";
+var IE = false;
 if (window.navigator.appName == "Microsoft Internet Explorer") {
 	AUDIO_EXT = ".mp3";
+	IE = true;
 }
 
 //------------------------------------------------------------------------------
@@ -510,6 +512,11 @@ function drawWin(surface) {
 //------------------------------------------------------------------------------
 // music control
 function playTune(name) {
+	
+	// drop sound support for the moment on IE, doesn't want to work (files too big?)
+	if (IE) {
+		return;
+	}
 	
 	if (gTune)
 	{
