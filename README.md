@@ -7,7 +7,7 @@ Game entry for Ludum Dare #25, theme: You are the Villain
 Copyright (c) 2012 Laurent Couvidou  
 Contact: <lorancou@free.fr>
 
-Raise towers, imprison princesses, watch knights trying to destabilize you
+Rise towers, imprison princesses, watch knights trying to destabilize you
 protective custody. Be a REAL VILLAIN, don't let them succeed! 
 
 Ah, yes, some of those knights try to disguise themselves. Don't let them fool
