@@ -43,6 +43,7 @@ var data = [
 	global.DATA_PATH + "princess.png",
 	global.DATA_PATH + "princess.png",
 	global.DATA_PATH + "floor.png",
+	global.DATA_PATH + "timer.png",
 	global.DATA_PATH + "title.png",
 	global.DATA_PATH + "vbar.png",
 	global.DATA_PATH + "tune_building" + AUDIO_EXT,
@@ -89,6 +90,7 @@ var gTitle = null;
 var gVBarLeft = null;
 var gVBarRight = null;
 var gMsg = null;
+var gTimer = null;
 
 //------------------------------------------------------------------------------
 // UI stuff
@@ -131,7 +133,7 @@ function init(levelIndex) {
         if ((objectA.kind == "knight" && objectB.kind == "princess") || (objectA.kind == "princess" && objectB.kind == "knight")) {
 			if (gState == STATE_DEFENDING) {
 				gState = STATE_LOST;
-				gMsg = new ui.msg("fail", [300, 200]);
+				gMsg = new ui.msg("fail", [300, 150]);
 				playTune("lost");
 			}
 		} else if (objectA.kind == "knight" && objectB.kind == "block") {
@@ -181,10 +183,11 @@ function init(levelIndex) {
     gFloor = new object.floor([0, 603], b2World);
 
 	// create UI
-	gFont = new gamejs.font.Font();
+	gFont = new gamejs.font.Font("20px sans-serif");
 	gTitle = new ui.title();
 	gVBarLeft = new ui.vbar(512 - level.constants[gLevelIndex].dropAreaWidth * 0.5);
 	gVBarRight = new ui.vbar(512 + level.constants[gLevelIndex].dropAreaWidth * 0.5);
+	gTimer = new ui.timer();
 	
 	if (levelIndex == 0) {
 		gMsg = new ui.msg("pick", [150, 180]);
@@ -359,7 +362,7 @@ function updateDefending(events, dt) {
 			gMsg = new ui.msg("end", [260, 180]);
 			playTune("end");
 		} else {
-			gMsg = new ui.msg("win", [300, 200]);
+			gMsg = new ui.msg("win", [300, 150]);
 			playTune("win");
 		}
 		gState = STATE_WIN;
@@ -459,11 +462,11 @@ function draw() {
     }
 	
 	// draw level #
-	mainSurface.blit(gFont.render("LEVEL " + (gLevelIndex + 1)), [970,10]);
+	mainSurface.blit(gFont.render("Level " + (gLevelIndex + 1)), [950,10]);
 }
 
 //------------------------------------------------------------------------------
-// draw defending
+// draw building
 function drawBuilding(surface) {
 	
 	gBlockStore.draw(surface);
@@ -471,11 +474,11 @@ function drawBuilding(surface) {
 	// draw remaining blocks count
 	for (var i=0; i<NUM_BLOCK_KINDS; ++i) {
 		if (gBlockStoreInventory[i] > 0) {
-			surface.blit(gFont.render("" + gBlockStoreInventory[i] + " x"), [20, gBlockStoreYOffsets[i] + 15]);
+			surface.blit(gFont.render("" + gBlockStoreInventory[i] + "x"), [16, gBlockStoreYOffsets[i] + 15]);
 		}
 	}
 	
-	surface.blit(gFont.render("BUILDING"), [10,10]);
+	//surface.blit(gFont.render("BUILDING"), [10,10]);
 }
 
 //------------------------------------------------------------------------------
@@ -484,21 +487,24 @@ function drawDefending(surface) {
 	
 	var duration = level.constants[gLevelIndex].duration;
 	var timeLeft = (duration - gStateTimer) / 1000;
-	surface.blit(gFont.render("DEFENDING " + timeLeft), [10,10]);
+	
+	gTimer.draw(surface);
+	surface.blit(gFont.render(Math.round(timeLeft)), [980,60]);
+	//surface.blit(gFont.render("DEFENDING " + timeLeft), [10,10]);
 }
 
 //------------------------------------------------------------------------------
 // draw lost
 function drawLost(surface) {
 	
-	surface.blit(gFont.render("LOST"), [10,10]);
+	//surface.blit(gFont.render("LOST"), [10,10]);
 }
 
 //------------------------------------------------------------------------------
 // draw win
 function drawWin(surface) {
 	
-	surface.blit(gFont.render("WIN"), [10,10]);
+	//surface.blit(gFont.render("WIN"), [10,10]);
 }
 
 //------------------------------------------------------------------------------

@@ -44,3 +44,17 @@ exports.msg = function(name, position) {
     return this;
 };
 gamejs.utils.objects.extend(exports.msg, gamejs.sprite.Sprite);
+
+//------------------------------------------------------------------------------
+// timer
+exports.timer = function() {
+    
+    exports.timer.superConstructor.apply(this, arguments);
+
+    // setup sprite
+    this.image = gamejs.image.load(global.DATA_PATH + "timer.png");
+    this.rect = new gamejs.Rect([960, 40]);
+	
+    return this;
+};
+gamejs.utils.objects.extend(exports.timer, gamejs.sprite.Sprite);
