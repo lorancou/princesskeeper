@@ -5,9 +5,16 @@ body{
     padding:0;
 }
 
-#gjs-loader {
-    width: 200px;
-    height: 1px;
+#gjs-loader-images {
+	width: 0px;
+	height: 32px;
+	background: url('../data/loading.png');
+}
+
+#gjs-loader-sounds {
+	width: 0px;
+	height: 32px;
+	background: url('../data/loading.png');
 }
 
 #gjs-canvas {
