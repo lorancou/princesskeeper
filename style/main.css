@@ -6,9 +6,8 @@ body{
 }
 
 #gjs-loader {
-    width: 1024px;
+    width: 200px;
     height: 1px;
-    background: url('../data/loading.png');
 }
 
 #gjs-canvas {

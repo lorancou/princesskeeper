@@ -6,6 +6,13 @@ var level = require('level');
 var ui = require('ui');
 
 //------------------------------------------------------------------------------
+// IE doesn't take Ogg
+var AUDIO_EXT = ".ogg";
+if (window.navigator.appName == "Microsoft Internet Explorer") {
+	AUDIO_EXT = ".mp3";
+}
+
+//------------------------------------------------------------------------------
 // preload everything, call main when done
 var data = [
 	global.DATA_PATH + "block00_1.png",
@@ -38,6 +45,11 @@ var data = [
 	global.DATA_PATH + "floor.png",
 	global.DATA_PATH + "title.png",
 	global.DATA_PATH + "vbar.png",
+	global.DATA_PATH + "tune_building" + AUDIO_EXT,
+	global.DATA_PATH + "tune_defending" + AUDIO_EXT,
+	global.DATA_PATH + "tune_end" + AUDIO_EXT,
+	global.DATA_PATH + "tune_lost" + AUDIO_EXT,
+	global.DATA_PATH + "tune_win" + AUDIO_EXT,
 ];
 gamejs.preload(data);
 gamejs.ready(main);
@@ -79,6 +91,10 @@ var gVBarRight = null;
 var gMsg = null;
 
 //------------------------------------------------------------------------------
+// UI stuff
+var gTune = null;
+
+//------------------------------------------------------------------------------
 // entry point
 function main() {
 
@@ -115,7 +131,8 @@ function init(levelIndex) {
         if ((objectA.kind == "knight" && objectB.kind == "princess") || (objectA.kind == "princess" && objectB.kind == "knight")) {
 			if (gState == STATE_DEFENDING) {
 				gState = STATE_LOST;
-				gMsg = new ui.msg("fail", [300, 200]);		
+				gMsg = new ui.msg("fail", [300, 200]);
+				playTune("lost");
 			}
 		} else if (objectA.kind == "knight" && objectB.kind == "block") {
 			objectA.hit = true;
@@ -174,6 +191,7 @@ function init(levelIndex) {
 	}
 		
 	gState = STATE_BUILDING;
+	playTune("building");
 }
     
 //------------------------------------------------------------------------------
@@ -294,6 +312,7 @@ function updateBuilding(events, dt) {
                     gStateTimer = 0.0;
                     gDefendingNextSpawn = 2000.0;
                     gDefendingNextLeft = true;
+					playTune("defending");
                 } else  {
 					// no more blocks in store, add the princess (level 0 - tutorial)
 					if (gBlockStore._sprites.length == 0) {
@@ -338,8 +357,10 @@ function updateDefending(events, dt) {
 	if (timeLeft < 0) {
 		if (gLevelIndex == (level.constants.length-1)) {
 			gMsg = new ui.msg("end", [260, 180]);
+			playTune("end");
 		} else {
 			gMsg = new ui.msg("win", [300, 200]);
+			playTune("win");
 		}
 		gState = STATE_WIN;
 	}
@@ -478,4 +499,17 @@ function drawLost(surface) {
 function drawWin(surface) {
 	
 	surface.blit(gFont.render("WIN"), [10,10]);
+}
+
+//------------------------------------------------------------------------------
+// music control
+function playTune(name) {
+	
+	if (gTune)
+	{
+		gTune.stop();
+	}
+	//var snd = new Audio(global.DATA_PATH + "tune_" + name + AUDIO_EXT);
+	gTune = new gamejs.mixer.Sound(global.DATA_PATH + "tune_" + name + AUDIO_EXT);
+	gTune.play(true);
 }
