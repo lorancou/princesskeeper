@@ -14,6 +14,15 @@ Ah, yes, some of those knights try to disguise themselves. Don't let them fool
 you. Maybe they're real goats, who knows. Anyways, keep your focus and your
 prisoner.
 
+Libraries
+--------------------------------------------------------------------------------
+
+Yabble is Copyright (c) 2010 James Brantly
+https://github.com/jbrantly/yabble
+
+GameJS is licensed under the MIT license
+http://gamejs.org/
+
 License
 --------------------------------------------------------------------------------
 
