@@ -17,11 +17,9 @@ prisoner.
 Libraries
 --------------------------------------------------------------------------------
 
-Yabble is Copyright (c) 2010 James Brantly
-https://github.com/jbrantly/yabble
+Yabble is Copyright (c) 2010 James Brantly: https://github.com/jbrantly/yabble
 
-GameJS is licensed under the MIT license
-http://gamejs.org/
+GameJS is licensed under the MIT license: http://gamejs.org/
 
 License
 --------------------------------------------------------------------------------
