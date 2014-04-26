@@ -19,7 +19,7 @@ Libraries
 
 Yabble is Copyright (c) 2010 James Brantly: https://github.com/jbrantly/yabble
 
-GameJS is licensed under the MIT license: http://gamejs.org/
+GameJs is licensed under the MIT license: http://gamejs.org/
 
 License
 --------------------------------------------------------------------------------
